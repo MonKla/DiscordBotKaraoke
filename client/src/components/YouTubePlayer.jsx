@@ -3,7 +3,7 @@ import { useYouTubePlayer, PlayerState } from '../hooks/useYouTubePlayer';
 import './YouTubePlayer.css';
 
 const YouTubePlayer = forwardRef(({ videoId, onTimeUpdate, onStateChange, onEnded }, ref) => {
-  const containerRef = useRef(null);
+  const lastVideoIdRef = useRef(null);
   
   const {
     isReady,
@@ -22,7 +22,6 @@ const YouTubePlayer = forwardRef(({ videoId, onTimeUpdate, onStateChange, onEnde
     }
   });
 
-  // Expose controls to parent
   useImperativeHandle(ref, () => ({
     play,
     pause,
@@ -31,35 +30,26 @@ const YouTubePlayer = forwardRef(({ videoId, onTimeUpdate, onStateChange, onEnde
     getCurrentTime: () => currentTime
   }), [play, pause, seekTo, setVolume, currentTime]);
 
-  // Initialize player when video ID changes
   useEffect(() => {
-    if (isReady && videoId) {
+    if (isReady && videoId && videoId !== lastVideoIdRef.current) {
+      lastVideoIdRef.current = videoId;
       loadVideo(videoId);
     }
   }, [isReady, videoId, loadVideo]);
 
-  // Report time updates
   useEffect(() => {
     onTimeUpdate?.(currentTime);
   }, [currentTime, onTimeUpdate]);
 
   return (
     <div className="youtube-player-wrapper">
-      <div 
-        id="youtube-player-container" 
-        ref={containerRef}
-        className="youtube-player-container"
-      />
-      
-      {/* Progress bar overlay */}
+      <div id="youtube-player-container" className="youtube-player-container" />
       <div className="player-progress">
         <div 
           className="progress-bar"
           style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%' }}
         />
       </div>
-
-      {/* Time display */}
       <div className="player-time">
         <span>{formatTime(currentTime)}</span>
         <span>/</span>
@@ -71,7 +61,6 @@ const YouTubePlayer = forwardRef(({ videoId, onTimeUpdate, onStateChange, onEnde
 
 YouTubePlayer.displayName = 'YouTubePlayer';
 
-// Helper function to format time
 function formatTime(seconds) {
   if (!seconds || isNaN(seconds)) return '0:00';
   const mins = Math.floor(seconds / 60);

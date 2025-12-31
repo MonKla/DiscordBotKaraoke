@@ -1,175 +1,197 @@
 .host-page {
   position: relative;
   height: 100vh;
+  width: 100vw;
+  background: radial-gradient(circle at top, #1e1e2e 0%, #0a0a0f 100%);
+  display: grid;
+  grid-template-rows: 80px 1fr 140px; /* Header, Main, Footer */
   overflow: hidden;
-  background: var(--bg-primary);
-  display: flex;
-  flex-direction: column;
+  color: white;
 }
 
-.loading, .error {
+/* 1. Header */
+.host-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-}
-
-.loading-spinner {
-  font-size: 3rem;
-}
-
-.room-code-corner {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  z-index: 100;
+  z-index: 50;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
 }
 
 .code-capsule {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
-  padding: 0.75rem 1.5rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.15);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .code-label {
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 1px;
+  opacity: 0.6;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .code-value {
-  font-size: 2.5rem;
+  font-size: 1.8rem;
   font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 0.1em;
-  line-height: 1;
+  color: var(--accent-primary, #7c3aed);
+  letter-spacing: 4px;
 }
 
+/* 2. Main Stage */
 .host-main {
-  flex: 1;
-  display: flex;
-  padding: 2rem;
-  gap: 2rem;
-  height: 100%;
-}
-
-.avatars-left, 
-.avatars-right {
-  width: 200px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 1fr auto auto; /* Video, Lyrics, Controls */
+  align-items: center;
+  justify-items: center;
+  padding: 0 2rem;
   gap: 1rem;
-  padding: 1rem 0;
-  overflow-y: auto;
-}
-
-.center-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
-  max-width: 1000px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-.video-container {
-  aspect-ratio: 16/9;
-  width: 100%;
-  background: #000;
-  border-radius: var(--radius-lg);
   overflow: hidden;
-  position: relative;
-  box-shadow: var(--shadow-2xl);
 }
 
-.no-song {
+.video-wrapper {
   width: 100%;
-  height: 100%;
+  max-width: 800px;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lyrics-wrapper {
+  width: 100%;
+  max-width: 800px;
+  height: clamp(80px, 15vh, 120px);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
+  margin: 0.5rem 0;
 }
 
-.no-song-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
+/* 3. Controls */
+.controls-bar {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-/* Queue Button */
-.queue-toggle-btn {
-  position: absolute;
-  bottom: 2rem;
-  right: 2rem;
+.control-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  border-radius: 50px;
-  border: none;
-  cursor: pointer;
-  z-index: 50;
+  gap: 0.75rem;
+  padding: 0.7rem 1.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  color: white;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .queue-count {
-  background: var(--accent-error);
+  background: #7c3aed;
   color: white;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  padding: 1px 7px;
+  border-radius: 8px;
   font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* 4. Footer Avatars */
+.avatars-footer {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 1.5rem;
+  padding: 0.5rem 2rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-/* Waiting Overlay */
-.waiting-overlay {
+.avatars-footer::-webkit-scrollbar { display: none; }
+
+/* Overlays & Utilities */
+.search-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(5px);
-  z-index: 200;
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.waiting-card {
+.search-card {
+  width: 90%;
+  max-width: 700px;
+  height: 85vh;
+  background: #1a1a25;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+}
+
+.search-header {
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.2);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.close-btn:hover { color: white; }
+
+.no-song {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  gap: 1rem;
   text-align: center;
+}
+
+.error-card {
+  background: rgba(220, 38, 38, 0.1);
   padding: 3rem;
-  background: var(--bg-secondary);
   border-radius: 20px;
-  max-width: 500px;
-}
-
-.waiting-icon {
-  font-size: 4rem;
-  display: block;
-  margin-bottom: 1rem;
-}
-
-code {
-  display: block;
-  background: rgba(0,0,0,0.3);
-  padding: 1rem;
-  border-radius: 8px;
-  margin: 1rem 0;
-  font-family: monospace;
-  font-size: 1.25rem;
-  color: var(--accent-primary);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  text-align: center;
 }

@@ -8,7 +8,7 @@ export default function LyricsDisplay({ song, currentTime, offset = 0 }) {
 
   // Fetch lyrics when song changes
   useEffect(() => {
-    if (!song?.title || !song?.artist) {
+    if (!song?.title) {
       setLyrics([]);
       return;
     }
@@ -16,15 +16,41 @@ export default function LyricsDisplay({ song, currentTime, offset = 0 }) {
     const fetchLyrics = async () => {
       setLoading(true);
       try {
-        // Use LRCLIB API to fetch synced lyrics
-        const response = await fetch(
-          `https://lrclib.net/api/search?track_name=${encodeURIComponent(song.title)}&artist_name=${encodeURIComponent(song.artist)}`
-        );
-        const data = await response.json();
+        // Sanitize title by removing keywords we added for YouTube search
+        const cleanTitle = song.title
+          .replace(/karaoke/gi, '')
+          .replace(/instrumental/gi, '')
+          .replace(/\(.*\)/g, '')
+          .replace(/\[.*\]/g, '')
+          .trim();
+
+        // Try searching with sanitized title and artist
+        let query = `https://lrclib.net/api/search?track_name=${encodeURIComponent(cleanTitle)}`;
+        if (song.artist) {
+          query += `&artist_name=${encodeURIComponent(song.artist)}`;
+        }
         
-        if (data && data.length > 0 && data[0].syncedLyrics) {
-          const parsed = parseLRC(data[0].syncedLyrics);
-          setLyrics(parsed);
+        let response = await fetch(query);
+        let data = await response.json();
+        
+        // If not found, try searching with a combined query
+        if ((!data || data.length === 0) && song.artist) {
+          const combinedQuery = `${cleanTitle} ${song.artist}`.trim();
+          response = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(combinedQuery)}`);
+          data = await response.json();
+        }
+        
+        if (data && data.length > 0) {
+          // Find the best match (favoring synced lyrics)
+          const match = data.find(item => item.syncedLyrics) || data[0];
+          if (match.syncedLyrics) {
+            setLyrics(parseLRC(match.syncedLyrics));
+          } else if (match.plainLyrics) {
+            // Fallback for non-synced lyrics
+            setLyrics([{ time: 0, text: match.plainLyrics }]);
+          } else {
+            setLyrics([]);
+          }
         } else {
           setLyrics([]);
         }

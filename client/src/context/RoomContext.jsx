@@ -148,6 +148,20 @@ export function RoomProvider({ children }) {
     });
   }, [socket]);
 
+  // Play previous song
+  const playPrevious = useCallback(() => {
+    return new Promise((resolve) => {
+      if (!socket) {
+        resolve(null);
+        return;
+      }
+
+      socket.emit('queue:previous', (response) => {
+        resolve(response?.song || null);
+      });
+    });
+  }, [socket]);
+
   // Update lyrics offset
   const adjustLyricsOffset = useCallback((offset) => {
     if (!socket) return;
@@ -217,6 +231,7 @@ export function RoomProvider({ children }) {
     addToQueue,
     removeFromQueue,
     skipSong,
+    playPrevious,
     adjustLyricsOffset,
     setupListeners
   };

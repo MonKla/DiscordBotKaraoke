@@ -25,6 +25,13 @@ export class RoomManager {
   }
 
   /**
+   * Link a guild ID to a room code
+   */
+  linkGuildToRoom(guildId, roomCode) {
+    this.guildToRoom.set(guildId, roomCode.toUpperCase());
+  }
+
+  /**
    * Create a new room
    */
   createRoom(options = {}) {

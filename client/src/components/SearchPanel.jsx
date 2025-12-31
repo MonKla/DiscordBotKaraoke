@@ -21,7 +21,8 @@ export default function SearchPanel() {
       // Append keywords to find karaoke versions
       const searchQuery = `${query} karaoke instrumental`;
       
-      const apiBase = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:3001`;
+      // Use relative path to leverage Vite proxy
+      const apiBase = ''; // Relative path
       const response = await fetch(`${apiBase}/api/search?q=${encodeURIComponent(searchQuery)}`);
       
       if (!response.ok) {

@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { useRoom } from '../context/RoomContext';
+import { Icons } from '../components/Icons';
 import './QueueList.css';
 
 export default function QueueList({ queue, currentSong }) {
-  const { removeFromQueue, skipSong } = useRoom();
+  const { removeFromQueue, skipSong, playPrevious } = useRoom();
 
   const handleRemove = async (songId) => {
     try {
@@ -31,9 +32,14 @@ export default function QueueList({ queue, currentSong }) {
               <span className="song-title">{currentSong.title}</span>
               <span className="song-artist">{currentSong.artist}</span>
             </div>
-            <button className="skip-btn" onClick={handleSkip}>
-              ⏭️ ข้าม
-            </button>
+            <div className="current-controls">
+              <button className="control-btn prev-btn" onClick={playPrevious}>
+                <Icons.ArrowLeft width={16} height={16} /> Previous
+              </button>
+              <button className="control-btn skip-btn" onClick={handleSkip}>
+                Skip <Icons.ArrowRight width={16} height={16} />
+              </button>
+            </div>
           </div>
         </div>
       )}

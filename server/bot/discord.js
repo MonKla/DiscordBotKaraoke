@@ -265,6 +265,10 @@ export class DiscordBot {
     room.voiceChannelId = voiceChannel.id;
     room.guildId = message.guild.id;
 
+    // Link guild to room
+    this.roomManager.linkGuildToRoom(message.guild.id, roomCode);
+    console.log(`🔗 Linked Guild [${message.guild.id}] to Room [${roomCode}]`);
+    
     // Join voice
     await this.joinVoice(message.guild.id, voiceChannel);
     await this.updateRoomMembers(room, message.guild.id);

@@ -179,6 +179,31 @@ export function setupSocketHandlers(io, roomManager, discordBot) {
       callback?.({ success: true, song: nextSong });
     });
 
+    /**
+     * Play previous song
+     */
+    socket.on('queue:previous', (callback) => {
+      if (!currentRoom) {
+        return callback?.({ success: false, error: 'Not in a room' });
+      }
+
+      const room = roomManager.getRoom(currentRoom);
+      if (!room) {
+        return callback?.({ success: false, error: 'Room not found' });
+      }
+
+      const prevSong = room.playPrevious();
+      if (prevSong) {
+        io.to(currentRoom).emit('player:song-changed', {
+          song: prevSong,
+          queue: room.queue
+        });
+        callback?.({ success: true, song: prevSong });
+      } else {
+        callback?.({ success: false, error: 'No history' });
+      }
+    });
+
     // ===== Player Events =====
 
     /**

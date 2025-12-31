@@ -20,6 +20,9 @@ export class Room {
     // Song queue
     this.queue = [];
 
+    // Song history (for "previous" functionality)
+    this.history = [];
+
     // Currently playing song
     this.currentSong = null;
 
@@ -149,7 +152,30 @@ export class Room {
    */
   playNext() {
     if (this.queue.length > 0) {
+      if (this.currentSong) {
+        this.history.push(this.currentSong);
+        // Keep history at reasonable size
+        if (this.history.length > 50) this.history.shift();
+      }
       this.currentSong = this.queue.shift();
+      this.playerState.isPlaying = true;
+      this.playerState.currentTime = 0;
+      this.updateActivity();
+      return this.currentSong;
+    }
+    return null;
+  }
+
+  /**
+   * Play previous song from history
+   */
+  playPrevious() {
+    if (this.history.length > 0) {
+      // Put current song back to front of queue
+      if (this.currentSong) {
+        this.queue.unshift(this.currentSong);
+      }
+      this.currentSong = this.history.pop();
       this.playerState.isPlaying = true;
       this.playerState.currentTime = 0;
       this.updateActivity();

@@ -8,8 +8,8 @@ export function SocketProvider({ children }) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Connect to server (dynamic based on current host)
-    const socketInstance = io(`http://${window.location.hostname}:3001`, {
+    // Connect using relative path (proxied by Vite to port 3001)
+    const socketInstance = io('/', {
       transports: ['websocket', 'polling']
     });
 
