@@ -3,17 +3,39 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet'; // Added helmet for Security Headers
+import 'libsodium-wrappers'; // Patched for Node 25 compat
+import 'opusscript'; // Ensure Opus encoder is loaded
+import '@snazzah/davey'; // Fix DAVE protocol missing module error
 import { DiscordBot } from './bot/discord.js';
 import { RoomManager } from './managers/RoomManager.js';
 import { setupSocketHandlers } from './socket/handlers.js';
 import { YouTube } from 'youtube-sr';
-
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+// Use Helmet for security headers (including CSP)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      connectSrc: ["'self'", "http://localhost:*", "ws://localhost:*", "https://discord.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.youtube.com", "https://s.ytimg.com"],
+      frameSrc: ["'self'", "https://www.youtube.com"],
+      imgSrc: ["'self'", "data:", "https://i.ytimg.com", "https://cdn.discordapp.com"]
+    }
+  },
+  crossOriginEmbedderPolicy: false // Required for some YouTube functionality
+}));
+
+// Silence Chrome DevTools probe (Handle all methods)
+app.use('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
+  res.sendStatus(200);
+});
 
 // CORS configuration
 const corsOptions = {
@@ -36,8 +58,6 @@ const discordBot = new DiscordBot(io, roomManager);
 // Setup socket handlers
 setupSocketHandlers(io, roomManager, discordBot);
 
-
-
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -45,6 +65,11 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     botConnected: discordBot.isReady()
   });
+});
+
+// Root endpoint to prevent "Cannot GET /" 404
+app.get('/', (req, res) => {
+  res.send('🎤 Discord Karaoke Party Server is running!');
 });
 
 // Search YouTube

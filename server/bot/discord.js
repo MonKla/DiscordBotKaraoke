@@ -176,22 +176,30 @@ export class DiscordBot {
       creatorId: message.author.id
     });
 
-    // Join voice channel
-    await this.joinVoice(message.guild.id, voiceChannel);
+    try {
+      // Join voice channel
+      await this.joinVoice(message.guild.id, voiceChannel);
 
-    // Update members
-    await this.updateRoomMembers(room, message.guild.id);
+      // Update members
+      await this.updateRoomMembers(room, message.guild.id);
 
-    message.reply(`
+      message.reply(`
 🎤 **Karaoke Room Created!**
 
 📌 **Room Code:** \`${room.code}\`
 🔊 **Voice Channel:** ${voiceChannel.name}
 
 **เปิดเว็บและใส่ Room Code เพื่อเริ่มร้องเพลง!**
-    `);
+      `);
+    } catch (error) {
+      console.error('Failed to initialize room voice connection:', error);
+      message.reply(`⚠️ สร้างห้องสำเร็จ แต่ Bot เข้า Voice Channel ไม่ได้: ${error.message}`);
+    }
   }
 
+  /**
+   * Join a voice channel
+   */
   /**
    * Join a voice channel
    */
@@ -223,7 +231,13 @@ export class DiscordBot {
       return connection;
     } catch (error) {
       console.error('Error joining voice channel:', error);
-      throw error;
+      // Clean up if connection failed
+      const connection = getVoiceConnection(guildId);
+      if (connection) {
+        connection.destroy();
+      }
+      // Re-throw handled error so caller knows it failed, but we logged it
+      throw new Error(`Failed to join voice channel: ${error.message}`);
     }
   }
 
